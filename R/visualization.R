@@ -1014,25 +1014,36 @@ AnnotationPlot <- function(object, region) {
       x = annotation.subset,
       f = annotation.subset$gene_name
     )
+#     p <- suppressWarnings(expr = suppressMessages(expr = autoplot(
+#       object = annotation.subset,
+#       GRangesFilter(value = region),
+#       fill = "darkblue",
+#       size = 1/2,
+#       color = "darkblue",
+#       names.expr = "gene_name"
+#     )))
     p <- suppressWarnings(expr = suppressMessages(expr = autoplot(
       object = annotation.subset,
       GRangesFilter(value = region),
-      fill = "darkblue",
+      aes_string(fill = "strand", color="strand"),
       size = 1/2,
-      color = "darkblue",
+      label.color  = 'black',
       names.expr = "gene_name"
-    )))
+    )))      
     p <- p@ggplot
     # extract y-axis limits and extend slightly so the label isn't covered
     y.limits <- ggplot_build(plot = p)$layout$panel_scales_y[[1]]$range$range
     p <- p + ylim(y.limits[[1]], y.limits[[2]] + 0.5)
   }
   p <- p +
+    scale_color_manual(values = c('+'='black', '-'='darkgrey')) +
+    scale_fill_manual(values = c('+'='black', '-'='darkgrey')) +
     theme_classic() +
     ylab("Genes") +
     xlab(label = paste0(chromosome, " position (kb)")) +
     xlim(start.pos, end.pos) +
     theme(
+      legend.position = "none",
       axis.ticks.y = element_blank(),
       axis.text.y = element_blank()
     )
@@ -1787,6 +1798,15 @@ ComputeTile <- function(
   for (i in seq_along(along.with = unique.groups)) {
     tot.use <- totals[names(x = groups[groups == unique.groups[[i]]])]
     cell.keep <- names(x = head(x = sort(x = tot.use, decreasing = TRUE), n))
+    
+    if (order == "random") {
+      if (n > length(tot.use)) {
+        cell.keep <- names(x = tot.use)
+      } else {
+        cell.keep <- sample(x = names(x = tot.use), size = n)
+      }
+    }
+
     cell.idx <- c(cell.idx, seq_along(along.with = cell.keep))
     cells.use <- c(cells.use, cell.keep)
   }
