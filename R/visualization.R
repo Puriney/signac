@@ -1885,7 +1885,7 @@ CreateTilePlot <- function(df, n, legend = TRUE) {
 theme_browser <- function(..., legend = TRUE) {
   browser.theme <- theme_classic() +
     theme(
-      axis.text.y = element_blank(),
+      #axis.text.y = element_blank(), # keep the yaxis num
       strip.background = element_blank(),
       strip.text.y.left = element_text(angle = 0)
     )
